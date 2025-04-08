@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { body, validationResult } from "express-validator";
+import { google } from "googleapis";
 
 const app = express();
 
@@ -35,7 +36,8 @@ app.post(
   async (
     req: express.Request<{}, {}, RegistrationData>,
     res: express.Response
-  ): Promise<void> => { // Явное указание типа возвращаемого значения Promise<void>
+  ): Promise<void> => {
+    // Явное указание типа возвращаемого значения Promise<void>
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.status(400).json({ errors: errors.array() });
@@ -47,7 +49,29 @@ app.post(
     try {
       // Здесь можно добавить логику сохранения в базу данных
       console.log("Registration received:", req.body);
-      // Пример: await saveToDatabase(req.body);
+
+      // Инициализация клиента для Google Sheets
+      const auth = new google.auth.JWT(
+        process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        undefined,
+        process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        ["https://www.googleapis.com/auth/spreadsheets"]
+      );
+
+      const sheets = google.sheets({ version: "v4", auth });
+
+      // Запись данных регистрации в Google Sheet
+      const appendResult = await sheets.spreadsheets.values.append({
+        spreadsheetId: process.env.SPREADSHEET_ID!,
+        range: "Sheet1!A:D", // Область, куда будет добавлена запись
+        valueInputOption: "USER_ENTERED",
+        insertDataOption: "INSERT_ROWS",
+        requestBody: {
+          values: [[email, nickname, ratingType, ratingValue]],
+        },
+      });
+
+      console.log("Google Sheets append result:", appendResult.data);
 
       res.json({ status: "ok", message: "Registration successful" });
     } catch (error) {

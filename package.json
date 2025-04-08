@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/app.ts",
+    "start": "ts-node --max-old-space-size=4096 src/app.ts",
     "dev": "nodemon --watch '**/*.ts' --exec ts-node app.ts"
   },
   "keywords": [],

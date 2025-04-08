@@ -63,7 +63,7 @@ app.post(
       // Запись данных регистрации в Google Sheet
       const appendResult = await sheets.spreadsheets.values.append({
         spreadsheetId: process.env.SPREADSHEET_ID!,
-        range: "Sheet1!A:D", // Область, куда будет добавлена запись
+        range: "Torneo!A:D", // Область, куда будет добавлена запись
         valueInputOption: "USER_ENTERED",
         insertDataOption: "INSERT_ROWS",
         requestBody: {

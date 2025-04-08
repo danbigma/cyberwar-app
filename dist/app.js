@@ -23,26 +23,44 @@ app.use((0, cors_1.default)({
     origin: (_a = process.env.FRONTEND_URL) !== null && _a !== void 0 ? _a : "http://localhost:3000",
     credentials: true,
 }));
-app.get("/", (req, res) => {
-    res.send("Hello from Express on Node.js with TypeScript!");
-});
 app.post("/registration", [
-    (0, express_validator_1.body)("email").isEmail().withMessage("Invalid email address"),
-    (0, express_validator_1.body)("nickname").notEmpty().withMessage("Nickname is required"),
+    (0, express_validator_1.body)("email")
+        .trim()
+        .isEmail()
+        .withMessage("Invalid email address")
+        .normalizeEmail(),
+    (0, express_validator_1.body)("nickname")
+        .trim()
+        .notEmpty()
+        .withMessage("Nickname is required")
+        .isLength({ min: 3 })
+        .withMessage("Nickname must be at least 3 characters"),
+    (0, express_validator_1.body)("ratingType")
+        .trim()
+        .notEmpty()
+        .withMessage("Rating type is required")
+        .isIn(["faceit", "premier"])
+        .withMessage("Rating type must be either 'faceit' or 'premier'"),
     (0, express_validator_1.body)("ratingValue")
+        .notEmpty()
+        .withMessage("Rating value is required")
         .isNumeric()
-        .withMessage("Rating value must be a number"),
+        .withMessage("Rating value must be a number")
+        .custom((value) => {
+        if (value < 0) {
+            throw new Error("Rating value cannot be negative");
+        }
+        return true;
+    }),
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    // Явное указание типа возвращаемого значения Promise<void>
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
-        return; // Важно завершить выполнение функции после отправки ответа
+        return;
     }
     const { email, nickname, ratingType, ratingValue } = req.body;
     try {
-        // Здесь можно добавить логику сохранения в базу данных
         console.log("Registration received:", req.body);
         // Инициализация клиента для Google Sheets
         const auth = new googleapis_1.google.auth.JWT(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, undefined, (_a = process.env.GOOGLE_PRIVATE_KEY) === null || _a === void 0 ? void 0 : _a.replace(/\\n/g, "\n"), ["https://www.googleapis.com/auth/spreadsheets"]);

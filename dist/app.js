@@ -16,7 +16,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const express_validator_1 = require("express-validator");
-const googleapis_1 = require("googleapis");
+const Registration_1 = __importDefault(require("./models/Registration"));
+const database_1 = __importDefault(require("./db/database"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
@@ -53,7 +54,6 @@ app.post("/registration", [
         return true;
     }),
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -62,20 +62,14 @@ app.post("/registration", [
     const { email, nickname, ratingType, ratingValue } = req.body;
     try {
         console.log("Registration received:", req.body);
-        // Инициализация клиента для Google Sheets
-        const auth = new googleapis_1.google.auth.JWT(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, undefined, (_a = process.env.GOOGLE_PRIVATE_KEY) === null || _a === void 0 ? void 0 : _a.replace(/\\n/g, "\n"), ["https://www.googleapis.com/auth/spreadsheets"]);
-        const sheets = googleapis_1.google.sheets({ version: "v4", auth });
-        // Запись данных регистрации в Google Sheet
-        const appendResult = yield sheets.spreadsheets.values.append({
-            spreadsheetId: process.env.SPREADSHEET_ID,
-            range: "Torneo!A:D", // Область, куда будет добавлена запись
-            valueInputOption: "USER_ENTERED",
-            insertDataOption: "INSERT_ROWS",
-            requestBody: {
-                values: [[email, nickname, ratingType, ratingValue]],
-            },
+        // Сохраняем данные в MongoDB
+        const registration = new Registration_1.default({
+            email,
+            nickname,
+            ratingType,
+            ratingValue,
         });
-        console.log("Google Sheets append result:", appendResult.data);
+        yield registration.save();
         res.json({ status: "ok", message: "Registration successful" });
     }
     catch (error) {
@@ -84,6 +78,8 @@ app.post("/registration", [
     }
 }));
 const PORT = (_b = process.env.PORT) !== null && _b !== void 0 ? _b : 4000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+(0, database_1.default)().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
 });

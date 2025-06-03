@@ -1,0 +1,23 @@
+/* Pixeloid Sans Regular */
+@font-face {
+    font-family: 'Pixeloid Sans';
+    src: url('/src/assets/fonts/PixeloidSans.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* TT Firs Neue Medium */
+@font-face {
+    font-family: 'TT Firs Neue';
+    src: url('/src/assets/fonts/TTFirsNeue.ttf') format('truetype');
+    font-weight: 500; /* Medium weight */
+    font-style: normal;
+}
+
+/* Roboto Mono Regular */
+@font-face {
+    font-family: 'Roboto Mono';
+    src: url('/src/assets/fonts/RobotoMono.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

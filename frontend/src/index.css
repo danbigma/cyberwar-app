@@ -1,0 +1,67 @@
+@import "./assets/style/fonts.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+.swiper {
+  height: 100%;
+  width: 100%;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  --swiper-navigation-size: 12px;
+  --swiper-navigation-color: rgb(254, 253, 253, 0.5);
+  background-color: #33393f;
+  border-radius: 50%;
+  padding: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  justify-content: center;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #fbfbfb !important;
+}
+
+.mySwiper {
+  position: relative;
+  padding-bottom: 40px !important;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7); /* затемнение фона */
+  z-index: 9999; /* убедитесь, что z-index достаточно высок */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  isolation: isolate; /* изолируем контекст наложения */
+}
+
+.modal-content {
+  background: #2b2f35;
+  padding: 20px;
+  border-radius: 15px;
+  z-index: 10000; /* выше, чем у overlay */
+  position: relative;
+}

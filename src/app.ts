@@ -1,9 +1,14 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
 import { body, validationResult } from "express-validator";
 import Registration from "./models/Registration";
 import connectDB from "./db/database";
 import { RegistrationData } from "./interface/RegistrationData";
+import { generateExcelFile } from "./services/excelService"; // Импортируем функцию для генерации Excel файла
+
 
 const app = express();
 
@@ -78,6 +83,19 @@ app.post(
     }
   }
 );
+
+app.get('/registrations/excel', async (req, res) => {
+  try {
+    const buffer = await generateExcelFile();
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=registrations.xlsx');
+    res.send(buffer);
+  } catch (error) {
+    console.error("Excel generation failed:", error);
+    res.status(500).json({ status: "error", message: "Excel generation failed" });
+  }
+});
 
 const PORT = process.env.PORT ?? 4000;
 
